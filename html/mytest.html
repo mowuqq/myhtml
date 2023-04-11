@@ -30,7 +30,7 @@
                 const href = anchors[i].getAttribute('href');
                 const extension = href.substr(href.lastIndexOf('.')).toLowerCase();
                 if (imageExtensions.includes(extension)) {
-                    images.push(`${folderPath}/${href}`);
+                    images.push(`${href}?raw=true`);
                 }
             }
             return images;
