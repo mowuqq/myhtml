@@ -36,7 +36,7 @@
             return images;
         }
 
-        const folderPath = 'https://raw.githubusercontent.com/mowuqq/myhtml/html/pic/'; // replace with your folder path
+        const folderPath = 'https://raw.githubusercontent.com/mowuqq/myhtml/html/pic'; // replace with your folder path
         const images = getImagesFromFolder(folderPath);
         const image = document.getElementById('image');
         let index = 0;
@@ -47,7 +47,7 @@
             }
             image.src = images[index];
             index++;
-            setTimeout(showNextImage, 1000); // replace 3000 with your desired interval in milliseconds
+            setTimeout(showNextImage, 3000); // replace 3000 with your desired interval in milliseconds
         }
 
         showNextImage();
