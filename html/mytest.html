@@ -35,7 +35,7 @@
             const images = imageGallery.querySelectorAll("img");
             const previousIndex = currentIndex;
             currentIndex = (currentIndex + 1) % images.length;
-            images[previousIndex].style.display = "none";
+            images[previousIndex].style.display = "";
             images[currentIndex].style.display = "block";
         }
         setInterval(showNextImage, 3000);
