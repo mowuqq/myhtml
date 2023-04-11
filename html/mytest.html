@@ -39,11 +39,11 @@
         const folderPath = 'pic/'; // replace with your folder path
         const images = getImagesFromFolder(folderPath);
         const image = document.getElementById('image');
-        let index = 0;
+        let index = 1;
 
         function showNextImage() {
             if (index >= images.length) {
-                index = 0;
+                index = 1;
             }
             image.src = images[index];
             index++;
