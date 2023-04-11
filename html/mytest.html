@@ -30,13 +30,13 @@
                 const href = anchors[i].getAttribute('href');
                 const extension = href.substr(href.lastIndexOf('.')).toLowerCase();
                 if (imageExtensions.includes(extension)) {
-                    images.push(`${href}?raw=true`);
+                    images.push(href);
                 }
             }
             return images;
         }
 
-        const folderPath = 'https://raw.githubusercontent.com/mowuqq/myhtml/master/html/pic'; // replace with your folder path
+        const folderPath = 'pic'; // replace with your folder path
         const images = getImagesFromFolder(folderPath);
         const image = document.getElementById('image');
         let index = 0;
