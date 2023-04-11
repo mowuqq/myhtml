@@ -37,8 +37,8 @@
             currentIndex = (currentIndex + 1) % images.length;
             images[previousIndex].style.display = "none";
             images[currentIndex].style.display = "block";
-            setTimeout(showNextImage, 0); // Replace 3000 with your desired interval in milliseconds
         }
+        setInterval(showNextImage, 3000);
 
         fetchImages();
         showNextImage();
