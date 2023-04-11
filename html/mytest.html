@@ -2,46 +2,54 @@
 <html>
 
 <head>
-    <title>GitHub Image Gallery</title>
+    <title>GitHub圖片輪流顯示</title>
+    <style>
+        #image-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #ddd;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+    </style>
 </head>
 
 <body>
-    <div id="image-gallery"></div>
-
+    <div id="image-container"></div>
     <script>
-        const username = "mowuqq";
-        const repoName = "myhtml";
-        const folderPath = "html/pic";
-
-        const imageGallery = document.getElementById("image-gallery");
-
-        function fetchImages() {
-            fetch(`https://api.github.com/repos/${username}/${repoName}/contents/${folderPath}`)
+        const username = 'mowuqq';
+        const repository = 'myhtml';
+        const images = [];
+        const imageContainer = document.getElementById('image-container');
+        function getImages(path) {
+            fetch(`https://api.github.com/repos/${username}/${repository}/contents/${path}`)
                 .then(response => response.json())
                 .then(data => {
-                    const images = data.filter(item => item.type === "file" && /\.(jpe?g|png|gif)$/i.test(item.name));
-                    images.forEach(image => {
-                        const imageElement = document.createElement("img");
-                        imageElement.src = image.download_url;
-                        imageGallery.appendChild(imageElement);
+                    data.forEach(item => {
+                        if (item.type === 'file' && item.path.match(/\.(jpe?g|png|gif)$/)) {
+                            images.push(item.download_url);
+                        } else if (item.type === 'dir') {
+                            getImages(item.path);
+                        }
                     });
                 })
-                .catch(error => console.error(error));
+                .then(() => {
+                    if (images.length > 0) {
+                        let index = 0;
+                        function changeImage() {
+                            index = (index + 1) % images.length;
+                            imageContainer.style.backgroundImage = `url(${images[index]})`;
+                        }
+                        setInterval(changeImage, 3000);
+                    }
+                })
+                .catch(error => {
+                    console.error(error);
+                });
         }
-
-        let currentIndex = 0;
-
-        function showNextImage() {
-            const images = imageGallery.querySelectorAll("img");
-            const previousIndex = currentIndex;
-            currentIndex = (currentIndex + 1) % images.length;
-            images[previousIndex].style.display = "";
-            images[currentIndex].style.display = "block";
-        }
-        setInterval(showNextImage, 3000);
-
-        fetchImages();
-        showNextImage();
+        getImages('html/pic');
     </script>
 </body>
 
