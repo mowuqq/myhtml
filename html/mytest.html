@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>中央圖片</title>
+    <title>动态加载图片</title>
     <style>
         .center {
             display: flex;
@@ -15,39 +15,51 @@
 
 <body>
     <div class="center">
-        <img id="image" src="" alt="yourimage--alt-text">
+        <img id="image" src="" alt="your-image-alt-text">
     </div>
     <script>
+        const folderPath = 'https://raw.githubusercontent.com/mowuqq/myhtml/html/pic/';
+        const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif'];
+        let images = [];
+
         function getImagesFromFolder(folderPath) {
-            const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif']; // add more extensions if needed
-            const images = [];
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', folderPath, false);
-            xhr.send();
-            const responseDocument = new DOMParser().parseFromString(xhr.response, 'text/html');
-            const anchors = responseDocument.querySelectorAll('a');
-            for (let i = 0; i < anchors.length; i++) {
-                const href = anchors[i].getAttribute('href');
-                const extension = href.substr(href.lastIndexOf('.')).toLowerCase();
-                if (imageExtensions.includes(extension)) {
-                    images.push(href);
+            return new Promise((resolve, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('GET', folderPath);
+                xhr.onload = function () {
+                    if (this.status === 200) {
+                        const responseDocument = new DOMParser().parseFromString(this.responseText, 'text/html');
+                        const anchors = responseDocument.querySelectorAll('a');
+                        for (let i = 0; i < anchors.length; i++) {
+                            const href = anchors[i].getAttribute('href');
+                            const extension = href.substr(href.lastIndexOf('.')).toLowerCase();
+                            if (imageExtensions.includes(extension)) {
+                                images.push(href);
+                            }
+                        }
+                        resolve(images);
+                    } else {
+                        reject(new Error('Unable to retrieve images.'));
+                    }
                 }
-            }
-            return images;
+                xhr.send();
+            });
         }
 
-        const folderPath = 'https://raw.githubusercontent.com/mowuqq/myhtml/html/pic'; // replace with your folder path
-        const images = getImagesFromFolder(folderPath);
-        const image = document.getElementById('image');
-        let index = 0;
-
-        function showNextImage() {
-            if (index >= images.length) {
-                index = 0;
+        async function showNextImage() {
+            try {
+                if (images.length === 0) {
+                    images = await getImagesFromFolder(folderPath);
+                }
+                const image = document.getElementById('image');
+                const imageSrc = images.shift();
+                image.src = imageSrc;
+                images.push(imageSrc);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setTimeout(showNextImage, 3000); // replace 3000 with your desired interval in milliseconds
             }
-            image.src = images[index];
-            index++;
-            setTimeout(showNextImage, 3000); // replace 3000 with your desired interval in milliseconds
         }
 
         showNextImage();
