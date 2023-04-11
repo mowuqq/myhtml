@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>中央圖片</title>
+    <style>
+        .center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="center">
+        <img id="image" src="" alt="yourimage--alt-text">
+    </div>
+    <script>
+        function getImagesFromFolder(folderPath) {
+            const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif']; // add more extensions if needed
+            const images = [];
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', folderPath, false);
+            xhr.send();
+            const responseDocument = new DOMParser().parseFromString(xhr.response, 'text/html');
+            const anchors = responseDocument.querySelectorAll('a');
+            for (let i = 0; i < anchors.length; i++) {
+                const href = anchors[i].getAttribute('href');
+                const extension = href.substr(href.lastIndexOf('.')).toLowerCase();
+                if (imageExtensions.includes(extension)) {
+                    images.push(href);
+                }
+            }
+            return images;
+        }
+
+        const folderPath = './pic'; // replace with your folder path
+        const images = getImagesFromFolder(folderPath);
+        const image = document.getElementById('image');
+        let index = 0;
+
+        function showNextImage() {
+            if (index >= images.length) {
+                index = 0;
+            }
+            image.src = images[index];
+            index++;
+            setTimeout(showNextImage, 1000); // replace 3000 with your desired interval in milliseconds
+        }
+
+        showNextImage();
+    </script>
+</body>
+
+</html>
