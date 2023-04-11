@@ -2,54 +2,45 @@
 <html>
 
 <head>
-    <title>中央圖片</title>
-    <style>
-        .center {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-    </style>
+    <title>GitHub Image Gallery</title>
 </head>
 
 <body>
-    <div class="center">
-        <img id="image" src="" alt="yourimage--alt-text">
-    </div>
+    <div id="image-gallery"></div>
+
     <script>
-        function getImagesFromFolder(folderPath) {
-            const imageExtensions = ['.jpg', '.jpeg', '.png', '.gif']; // add more extensions if needed
-            const images = [];
-            const xhr = new XMLHttpRequest();
-            xhr.open('GET', folderPath, false);
-            xhr.send();
-            const responseDocument = new DOMParser().parseFromString(xhr.response, 'text/html');
-            const anchors = responseDocument.querySelectorAll('a');
-            for (let i = 0; i < anchors.length; i++) {
-                const href = anchors[i].getAttribute('href');
-                const extension = href.substr(href.lastIndexOf('.')).toLowerCase();
-                if (imageExtensions.includes(extension)) {
-                    images.push(href);
-                }
-            }
-            return images;
+        const username = "<YOUR_USERNAME>";
+        const repoName = "<YOUR_REPO_NAME>";
+        const folderPath = "<YOUR_FOLDER_PATH>";
+
+        const imageGallery = document.getElementById("image-gallery");
+
+        function fetchImages() {
+            fetch(`https://api.github.com/repos/${username}/${repoName}/contents/${folderPath}`)
+                .then(response => response.json())
+                .then(data => {
+                    const images = data.filter(item => item.type === "file" && /\.(jpe?g|png|gif)$/i.test(item.name));
+                    images.forEach(image => {
+                        const imageElement = document.createElement("img");
+                        imageElement.src = image.download_url;
+                        imageGallery.appendChild(imageElement);
+                    });
+                })
+                .catch(error => console.error(error));
         }
 
-        const folderPath = "https://github.com/mowuqq/myhtml/tree/main/html/pic"; // replace with your folder path
-        const images = getImagesFromFolder(folderPath);
-        const image = document.getElementById('image');
-        let index = 1;
+        let currentIndex = 0;
 
         function showNextImage() {
-            if (index >= images.length) {
-                index = 1;
-            }
-            image.src = images[index];
-            index++;
-            setTimeout(showNextImage, 3000); // replace 3000 with your desired interval in milliseconds
+            const images = imageGallery.querySelectorAll("img");
+            const previousIndex = currentIndex;
+            currentIndex = (currentIndex + 1) % images.length;
+            images[previousIndex].style.display = "none";
+            images[currentIndex].style.display = "block";
+            setTimeout(showNextImage, 3000); // Replace 3000 with your desired interval in milliseconds
         }
 
+        fetchImages();
         showNextImage();
     </script>
 </body>
